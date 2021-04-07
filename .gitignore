@@ -1,3 +1,7 @@
 *
 
 !.gitignore
+!README.md
+!LICENSE
+
+!mdarray.hpp
