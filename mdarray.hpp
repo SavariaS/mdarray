@@ -1,77 +1,189 @@
 #ifndef MDARRAY_HPP
 #define MDARRAY_HPP
 
+// Types 
 #include <cstddef>
-#include <initializer_list>
 #include <iterator>
+#include <initializer_list>
+// Exceptions 
 #include <stdexcept>
+// Type traits
 #include <type_traits>
+// Memcpy
 #include <cstring>
 
-#include <iostream>
 
-namespace temp
+namespace mdlib
 {
-    /* Forward declaration */
+    //
+    //--- Forward declaration ---//
+    //
     template<typename T, std::size_t... N>
     struct mdarray;
+    //
+    //--- END --//
+    //
+    // 
 
-    /* Helper metafunctions */
+    //
+    //--- Helper metafunctions ---//
+    //
     template<typename T, std::size_t D>
     using id = T;
 
+    // mdize returns the volume of a mdarray
+    // Forward declaration of mdsize
+    template<typename T, std::size_t... N>
+    struct mdsize;
+
+    template<typename T, std::size_t... N>
+    struct mdsize<mdarray<T, N...>>
+    {
+        static constexpr std::size_t value = (1 * ... * N);
+    };
+
+    // subarray is the type of mdarray's subarray. Shaves 1 dimension from the mdarray
     // Forward declaration of subarray
     template<typename T, std::size_t... N>
-    struct md_subarray;
+    struct mdsubarray;
     template<typename T, std::size_t... N>
-    using md_subarray_t = typename md_subarray<T, N...>::type;
+    using mdsubarray_T = typename mdsubarray<T, N...>::type;
 
     // Base case of subarray
     template<typename T, std::size_t Head>
-    struct md_subarray<T, Head>
+    struct mdsubarray<T, Head>
     {
         using type = T;
     };
 
     // Recursive case of subarray
     template<typename T, std::size_t Head, std::size_t... Tail>
-    struct md_subarray<T, Head, Tail...>
+    struct mdsubarray<T, Head, Tail...>
     {
-        using type = mdarray<md_subarray_t<T, Tail...>, Tail...>;
+        using type = mdarray<mdsubarray_T<T, Tail...>, Tail...>;
     };
 
-    // Index sequence used for subarrays
+    // index_sequence is a parameter pack containing indices [0, N)
+    // Forward declaration of index_sequence
     template<std::size_t... N>
     struct index_sequence {};
 
-    // Recursive function to make index sequence
-    template<std::size_t Head, std::size_t... Tail>
-    auto make_index_sequence_impl()
+    // Forward declaration of next_index_sequence
+    template<typename T>
+    struct next_index_sequence;
+
+    // Append the next index at the end of an index sequence
+    template<std::size_t... N>
+    struct next_index_sequence<index_sequence<N...>>
+    {
+        using type = index_sequence<N..., sizeof...(N)>;
+    };
+
+    // Forward declaration of make_index_seq_impl
+    template<std::size_t I, std::size_t N>
+    struct make_index_seq_impl;
+    // Make an index_sequence containing indices [0, N)
+    template<std::size_t N>
+    using make_index_sequence = make_index_seq_impl<0, N>::type;
+
+    // Recursive case
+    template<std::size_t I, std::size_t N>
+    struct make_index_seq_impl
+    {
+        using type = next_index_sequence<typename make_index_seq_impl<I+1, N>::type>::type;
+    };
+
+    // Base case (when I reaches the size of the futur index_sequence)
+    template<std::size_t N>
+    struct make_index_seq_impl<N, N>
+    {
+        using type = index_sequence<>;
+    };
+
+    // mdarray_storage is the data member type. T[] when owning, T* when referencing
+    // Forward declaration of mdarray_storage
+    template<bool Owning, typename T, std::size_t... N>
+    struct mdarray_storage;
+    template<bool Owning, typename T, std::size_t... N>
+    using mdarray_storage_T = mdarray_storage<Owning, T, N...>::type;
+
+    // Case where mdarray_storage is owning
+    template<typename T, std::size_t... N>
+    struct mdarray_storage<true, T, N...>
+    {
+        using type = T[(1*...*N)];
+    };
+
+    // Case where mdarray_storage is referencing
+    template<typename T, std::size_t... N>
+    struct mdarray_storage<false, T, N...>
+    {
+        using type = T* const;
+    };
+
+    // from_array_impl defines a mdarray type from the corresponding built-in type
+    // Forward declaration of from_array_impl
+    template <typename T, typename Seq>
+    struct from_array_impl;
+
+    // Define mdarray from a number of dimensions (rank)
+    template <typename T, size_t... Is>
+    struct from_array_impl<T, index_sequence<Is...>> 
+    {
+        //                   Get the type                  Get the extent size (extent) of each dimension
+        using type = mdarray<std::remove_all_extents_t<T>, std::extent_v<T, Is>...>;
+    };
+
+    // Deduce the number of dimensions (rank) of a built-in array and return the corresponding mdarray
+    template <typename T>
+    using from_array = from_array_impl<T, make_index_sequence<std::rank_v<T>>>::type;
+    //
+    //--- END --//
+    // 
+
+    //
+    //--- Helper functions --//
+    //
+    // Copies range
+    template<class InputItr>
+    void copy(InputItr first, InputItr last, InputItr dest)
+    {
+        while(first != last)
+        {
+            *dest = *first;
+
+            ++first;
+            ++dest;
+        }
+    }
+
+    // Get the address of the first element of a multidimensional, built-in array
+    template<typename T, std::size_t N>
+    constexpr std::remove_all_extents_t<T>* to_pointer(T (&arr)[N])
     {
         // Base case
-        if constexpr (Head == 0)
+        if constexpr (std::rank<T>::value == 0)
         {
-            return index_sequence<Tail...>();
+            return &(arr[0]);
         }
-        // Recursive case
         else
         {
-            return make_index_sequence_impl<Head-1, Head-1, Tail...>();
+            return to_pointer(arr[0]);
         }
     }
+    //
+    //--- END --//
+    //
 
-    template<std::size_t Head, std::size_t... Tail>
-    auto make_index_sequence()
-    {
-        return make_index_sequence_impl<(1*...*Tail)>();
-    }
-
+    //
+    //--- mdarray ---//
+    //
     template<typename T, std::size_t... N>
     struct mdarray
     {
         public:
-            /* Type definitions */
-            using value_type = T;
+            //--- Type definitions ---//
+            using value_type = std::remove_reference_t<T>;
             using size_type              = std::size_t;
             using size_ilist             = const std::initializer_list<size_type>&;
             using difference_type        = std::ptrdiff_t;
@@ -85,75 +197,72 @@ namespace temp
             using reverse_iterator       = std::reverse_iterator<iterator>;
             using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-            using subarray               = md_subarray_t<value_type, N...>;
-            using const_subarray         = const md_subarray_t<value_type, N...>;
+            using subarray               = mdsubarray_T<value_type&, N...>;
+            using const_subarray         = const mdsubarray_T<const value_type&, N...>;
 
-            /* Data member */
-            value_type _m_arr[(1 * ... * N)];
+            //--- Data member ---//
+            // value_type[] when owning
+            // value_type* const when referencing
+            mdarray_storage_T<!std::is_reference<T>::value, value_type, N...> _m_arr;
+            
+            //--- Conversion operator ---//
+            operator mdarray<value_type, N...> () const
+            {
+                return [this]<std::size_t... Seq>(index_sequence<Seq...>) -> mdarray<value_type, N...>
+                       {
+                           return { _m_arr[Seq]...};
+                       }(make_index_sequence<(1 * ... * N)>());
+            }
 
-            /* Elements access */
+            //--- Elements access ---//
             constexpr reference at(id<size_type, N>... pos)
             {
-                size_type indices[sizeof...(N)] = {pos...};
-
                 size_type index = 0;
-                size_type position = 0;
                 size_type weight = (1 * ... * N);
 
-                for(size_type dim : s_sizes)
+                (([&index, &weight](size_type pos, size_type dim) // Glorified loop
                 {
-                    if(indices[index] >= dim)
-                    {
-                        throw std::out_of_range("mdarray::at: pos[" + std::to_string(index) + "] (which is " + std::to_string(indices[index]) + ") >= size[" + std::to_string(index) + "] (which is " + std::to_string(dim) + ")");
-                    }
+                    if(pos >= dim)
+                        throw std::out_of_range("mdarray::at: pos (which is "+std::to_string(pos)+") >= dim (which is "+std::to_string(dim)+")");
 
                     weight /= dim;
-                    position += indices[index] * weight;
-                    ++index;
-                }
+                    index += pos * weight;
+                }(pos, N)),...); // For each index and its corresponding dimension...
 
-                return _m_arr[position];
+                return _m_arr[index];
             }
 
             constexpr const_reference at(id<size_type, N>... pos) const
             {
-                size_type indices[sizeof...(N)] = {pos...};
-
                 size_type index = 0;
-                size_type position = 0;
                 size_type weight = (1 * ... * N);
 
-                for(size_type dim : s_sizes)
+                (([&index, &weight](size_type pos, size_type dim) // Glorified loop
                 {
-                    if(indices[index] >= dim)
-                    {
-                        throw std::out_of_range("mdarray::at: pos[" + std::to_string(index) + "] (which is " + std::to_string(indices[index]) + ") >= size[" + std::to_string(index) + "] (which is " + std::to_string(dim) + ")");
-                    }
+                    if(pos >= dim)
+                        throw std::out_of_range("mdarray::at: pos (which is "+std::to_string(pos)+") >= dim (which is "+std::to_string(dim)+")");
 
                     weight /= dim;
-                    position += indices[index] * weight;
-                    ++index;
-                }
+                    index += pos * weight;
+                }(pos, N)),...); // For each index and its corresponding dimension...
 
-                return _m_arr[position];
+                return _m_arr[index];
             }
 
             constexpr subarray operator[](size_type pos)
             {
-                // Use a lambda to capture index_sequence's parameter pack
-                return [pos, this]<std::size_t... Seq>(index_sequence<Seq...>) -> subarray
-                       {
-                           return { _m_arr[pos * sizeof...(Seq) + Seq]...};
-                       }(make_index_sequence<N...>());
+                if constexpr (sizeof...(N) == 1) // If array has 1 dimension, return the value
+                    return _m_arr[pos];
+                else                             // Else, return a subarray
+                    return {&_m_arr[pos * (1 * ... * N) / *s_size_ilist.begin()]};
             }
 
             constexpr const_subarray operator[](size_type pos) const
             {
-                // Use a lambda to capture index_sequence's parameter pack
-                return [pos, this]<std::size_t... Seq>(index_sequence<Seq...>) -> const_subarray
-                       {
-                           return { _m_arr[pos * sizeof...(Seq) + Seq]...};
-                       }(make_index_sequence<N...>());
+                if constexpr (sizeof...(N) == 1) // If array has 1 dimension, return the value
+                    return _m_arr[pos];
+                else                             // Else, return a subarray
+                    return {&_m_arr[pos * (1 * ... * N) / *s_size_ilist.begin()]};
             }
 
             constexpr reference front() { return _m_arr[0]; }
@@ -164,7 +273,7 @@ namespace temp
             constexpr pointer data() noexcept { return _m_arr; }
             constexpr const_pointer data() const noexcept { return _m_arr; }
 
-            /* Iterators */
+            //--- Iterators ---// 
             constexpr iterator begin() noexcept { return iterator(data()); }
             constexpr iterator end()   noexcept { return iterator(data() + (1*...*N)); }
             constexpr reverse_iterator rbegin() noexcept { return reverse_iterator(end()); }
@@ -180,78 +289,70 @@ namespace temp
             constexpr const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(cend()); }
             constexpr const_reverse_iterator crend()   const noexcept { return const_reverse_iterator(cbegin()); }
 
-            /* Capacity */
+            //--- Capacity ---//
             [[nodiscard]] constexpr bool empty() const noexcept { return ((1 * ... * N) == 0) ? true : false; }
-            constexpr size_ilist size() const noexcept { return s_sizes; }
-            constexpr size_ilist max_size() const noexcept { return s_sizes; }
+            constexpr size_ilist size() const noexcept { return s_size_ilist; }
+            constexpr size_ilist max_size() const noexcept { return s_size_ilist; }
 
-            /* Operations */
+            //--- Operations ---//
             constexpr void fill(const value_type& value)
             {
-                if(std::is_trivially_copyable<value_type>::value)
+                for(iterator itr = begin(); itr != end(); ++itr)
                 {
-                    for(iterator itr = begin(); itr != end(); ++itr)
-                    {
-                        std::memcpy(itr, &value, sizeof(value_type));
-                    }
-                }
-                else
-                {
-                    for(iterator itr = begin(); itr != end(); ++itr)
-                    {
-                        *itr = value;
-                    }
+                    *itr = value;
                 }
             }
 
             constexpr void swap(mdarray<T, N...>& other)
             {
-                mdarray<T, N...> temp{};
+                mdarray<T, N...> awooo{};
 
-                if(std::is_trivially_copyable<value_type>::value)
-                {
-                    std::memcpy(temp.data(), this->data(), sizeof(mdarray<T, N...>));
-
-                    std::memcpy(this->data(), other.data(), sizeof(mdarray<T, N...>));
-                    std::memcpy(other.data(), temp.data(), sizeof(mdarray<T, N...>));
-                }
-                else
-                {
-                    iterator src;
-                    iterator dest;
-
-                    src = this->begin();
-                    dest = temp.begin();
-                    while(src != this->end())
-                    {
-                        *dest = *src;
-                        ++src;
-                        ++dest;
-                    }
-
-                    src = other.begin();
-                    dest = this->begin();
-                    while(src != other.end())
-                    {
-                        *dest = *src;
-                        ++src;
-                        ++dest;
-                    }
-
-                    src = temp.begin();
-                    dest = other.begin();
-                    while(src != temp.end())
-                    {
-                        *dest = *src;
-                        ++src;
-                        ++dest;
-                    }
-                }
+                copy(this->begin(), this->end(), awooo.begin());
+                copy(other.begin(), other.end(), this->begin());
+                copy(awooo.begin(), awooo.end(), other.begin());
             }
 
         private:
-            static constexpr size_ilist s_sizes = {N...};
+            //--- Static size initialize list ---//
+            static constexpr size_ilist s_size_ilist = {N...};
     };
+    //
+    //--- END --//
+    //
 }
+
+//
+//--- Specialization of standard library functions ---//
+//
+namespace std
+{
+    template<std::size_t... I, typename T, std::size_t... N>
+    T& get(mdlib::mdarray<T, N...>& arr)
+    {
+        return arr.at(I...);
+    }
+
+    template<typename T, std::size_t... N>
+    void swap(mdlib::mdarray<T, N...>& lhs, mdlib::mdarray<T, N...>& rhs)
+    {
+        lhs.swap(rhs);
+    }
+
+    template<typename T, std::size_t N>
+    constexpr mdlib::from_array<std::remove_cv_t<T[N]>> to_mdarray(T (&arr)[N])
+    {
+        auto ptr = mdlib::to_pointer(arr);
+        return [ptr]()
+                {
+                    // Copy the built-in array into the mdarray
+                    mdlib::from_array<std::remove_cv_t<T[N]>> temp;
+                    std::memcpy(temp.data(), ptr, sizeof(temp));
+                    return temp;
+                }();
+    }
+}
+//
+//--- END --//
+//
 
 #endif
