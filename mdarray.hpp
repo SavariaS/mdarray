@@ -152,26 +152,10 @@ namespace mdlib
         {
             *dest = *first;
 
-            ++first;
+            ++first; 
             ++dest;
         }
     }
-
-    // Get the address of the first element of a multidimensional, built-in array
-    template<typename T, std::size_t N>
-    constexpr std::remove_all_extents_t<T>* to_pointer(T (&arr)[N])
-    {
-        // Base case
-        if constexpr (std::rank<T>::value == 0)
-        {
-            return &(arr[0]);
-        }
-        else
-        {
-            return to_pointer(arr[0]);
-        }
-    }
-    //
     //--- END --//
     //
 
@@ -341,14 +325,10 @@ namespace std
     template<typename T, std::size_t N>
     constexpr mdlib::from_array<std::remove_cv_t<T[N]>> to_mdarray(T (&arr)[N])
     {
-        auto ptr = mdlib::to_pointer(arr);
-        return [ptr]()
-                {
-                    // Copy the built-in array into the mdarray
-                    mdlib::from_array<std::remove_cv_t<T[N]>> temp;
-                    std::memcpy(temp.data(), ptr, sizeof(temp));
-                    return temp;
-                }();
+        // Copy the built-in array into the mdarray
+        mdlib::from_array<std::remove_cv_t<T[N]>> temp{};
+        std::memcpy(temp.data(), arr, sizeof(temp));
+        return temp;
     }
 }
 //
