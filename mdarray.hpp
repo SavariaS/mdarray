@@ -125,13 +125,11 @@ namespace mdlib
     {
         public:
             //--- Type definitions ---//
-            using value_type = std::remove_reference_t<T>;
+            using value_type = T;
             using size_type              = std::size_t;
             using size_ilist             = const std::initializer_list<size_type>&;
             using difference_type        = std::ptrdiff_t;
 
-            using reference              = value_type&;
-            using const_reference        = const value_type&;
             using pointer                = value_type*;
             using const_pointer          = const value_type*;
             using iterator               = value_type*;
@@ -202,7 +200,7 @@ namespace mdlib
     {
         public:
             //--- Type definitions ---//
-            using value_type = std::remove_reference_t<T>;
+            using value_type = T;
             using size_type              = std::size_t;
             using size_ilist             = const std::initializer_list<size_type>&;
             using difference_type        = std::ptrdiff_t;
@@ -216,8 +214,8 @@ namespace mdlib
             using reverse_iterator       = std::reverse_iterator<iterator>;
             using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-            using subarray               = to_subarray_T<value_type&, N...>;
-            using const_subarray         = const to_subarray_T<const value_type&, N...>;
+            using subarray               = to_subarray_T<value_type, N...>;
+            using const_subarray         = const to_subarray_T<const value_type, N...>;
             using subspan                = to_subspan_T<value_type, N...>;
             using const_subspan          = to_subspan_T<const value_type, N...>;
 
@@ -315,11 +313,11 @@ namespace mdlib
 
             constexpr void swap(mdarray<T, N...>& other)
             {
-                mdarray<T, N...> awooo{};
+                mdarray<T, N...> atemp{};
 
-                copy(this->begin(), this->end(), awooo.begin());
+                copy(this->begin(), this->end(), atemp.begin());
                 copy(other.begin(), other.end(), this->begin());
-                copy(awooo.begin(), awooo.end(), other.begin());
+                copy(atemp.begin(), atemp.end(), other.begin());
             }
 
         private:
