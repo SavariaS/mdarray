@@ -17,9 +17,6 @@
 
 * Format documentation
 * Write documentation for individual functions
-* Add the following operators:
-    * `mdlib::mdarray::operator<=>(mdlib::mdarray)`
-    * `mdlib:mdspan::operator<=>(mdlib::mdspan)`
 * Add the following helper classes:
     * `std::tuple_size<mdlib::mdarray>`
     * `std::tuple_element<mdlib::mdarray>`

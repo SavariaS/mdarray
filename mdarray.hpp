@@ -324,6 +324,43 @@ namespace mdlib
             //--- Static size initialize list ---//
             static constexpr size_ilist s_size_ilist = {N...};
     };
+
+    // Comparison operators
+    template<typename T, std::size_t... N>
+    bool operator<=>(const mdspan<T, N...>& rhs, const mdspan<T, N...>& lhs)
+    {
+        auto a = rhs.begin();
+        auto b = lhs.begin();
+
+        while(a != rhs.end())
+        {
+            if(*a != *b)
+                return 1;
+
+            ++a;
+            ++b;
+        }
+
+        return 0;
+    }
+
+    template<typename T, std::size_t... N>
+    bool operator<=>(const mdarray<T, N...>& rhs, const mdarray<T, N...>& lhs)
+    {
+        auto a = rhs.begin();
+        auto b = lhs.begin();
+
+        while(a != rhs.end())
+        {
+            if(*a != *b)
+                return 1;
+
+            ++a;
+            ++b;
+        }
+
+        return 0;
+    }
     
     // Conversion operator from mdpsan to mdarray
     template<typename T, std::size_t... N>
