@@ -187,7 +187,8 @@ namespace mdlib
             constexpr const_reverse_iterator crend()   const noexcept { return const_reverse_iterator(cbegin()); }
 
             //--- Capacity ---//
-            constexpr size_ilist size() const noexcept { return s_size_ilist; }
+            constexpr size_type size() const noexcept { return (1 * ... * N); }
+            constexpr size_ilist size_list() const noexcept { return s_size_ilist; }
 
         private:
             //--- Static size initialize list ---//
@@ -274,9 +275,9 @@ namespace mdlib
             }
 
             constexpr reference front() { return _m_arr[0]; }
-            constexpr reference back()  { return _m_arr[(1*...*N)]; }
+            constexpr reference back()  { return _m_arr[(1*...*N) - 1]; }
             constexpr const_reference front() const { return _m_arr[0]; }
-            constexpr const_reference back()  const { return _m_arr[(1*...*N)]; }
+            constexpr const_reference back()  const { return _m_arr[(1*...*N) - 1]; }
 
             constexpr pointer data() noexcept { return _m_arr; }
             constexpr const_pointer data() const noexcept { return _m_arr; }
@@ -299,8 +300,9 @@ namespace mdlib
 
             //--- Capacity ---//
             [[nodiscard]] constexpr bool empty() const noexcept { return ((1 * ... * N) == 0) ? true : false; }
-            constexpr size_ilist size() const noexcept { return s_size_ilist; }
-            constexpr size_ilist max_size() const noexcept { return s_size_ilist; }
+            constexpr size_type size() const noexcept { return (1 * ... * N); }
+            constexpr size_type max_size() const noexcept { return (1 * ... * N); }
+            constexpr size_ilist size_list() const noexcept { return s_size_ilist; }
 
             //--- Operations ---//
             constexpr void fill(const value_type& value)
