@@ -215,8 +215,6 @@ namespace mdlib
             using reverse_iterator       = std::reverse_iterator<iterator>;
             using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-            using subarray               = to_subarray_T<value_type, N...>;
-            using const_subarray         = const to_subarray_T<const value_type, N...>;
             using subspan                = to_subspan_T<value_type, N...>;
             using const_subspan          = to_subspan_T<const value_type, N...>;
 
