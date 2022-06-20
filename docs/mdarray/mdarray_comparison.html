@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>mdlib::mdarray<T, N...>::operator<=></title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+  <body>
+    <nav>
+        <a href="mdarray.html">Back</a>
+    </nav>
+  
+    <header>
+      <h1>mdlib::mdarray&lt;T, N...&gt;::operator&lt;=&gt;</h3>
+        <p><code>&nbsp;&nbsp;template&lt;typename T, std::size_t... N&gt;<br>
+                 &nbsp;&nbsp;bool operator&lt;=&gt;(const mdarray&lt;T, N...&gt;& rhs, const mdarray&lt;T, N...&gt;& lhs)</code></p>
+        <p>Compares the content of two arrays.</p>
+      <br>
+    </header>
+
+    <section>
+      <h2>Parameters</h3>
+      <p><strong>lhs, rhs</strong> - mdarrays whose contents to compare.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Return value</h3>
+      <p><code>0</code> if the contents of both arrays are the same, <code>1</code> otherwise.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Example</h3>
+      <pre>
+#include &lt;mdarray.hpp&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    mdlib::mdarray&lt;int, 5, 4&gt; arr1 = {12, 12, 12, 12,
+                                      12, 12, 12, 12,
+                                      12, 12, 12, 12,
+                                      12, 12, 12, 12,
+                                      12, 12, 12, 12};
+    
+    mdlib::mdarray&lt;int, 5, 4&gt; arr2;
+    arr2.fill(12);
+
+    if(arr1 &lt;=&gt; arr2 == 0)
+    {
+        std::cout << "Both arrays are the same.\n";
+    }
+    else
+    {
+        std::cout << "The arrays are different.\n";
+    }
+}</pre>
+
+      <p>Output</p>
+      <pre>
+Both arrays are the same.</pre>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>mdlib::mdarray<T, N...>::rbegin, mdlib::mdarray<T, N...>::crbegin</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+  <body>
+    <nav>
+        <a href="mdarray.html">Back</a>
+    </nav>
+  
+    <header>
+      <h1>mdlib::mdarray&lt;T, N...&gt;::rbegin, mdlib::mdarray&lt;T, N...&gt;::crbegin</h3>
+      <p><code>&nbsp;&nbsp;reverse_iterator rbegin() noexcept;</code></p>
+      <p><code>&nbsp;&nbsp;const_reverse_iterator crbegin() const noexcept;</code></p>
+      <p>Returns an iterator to the first element of the reversed multi-dimensional array.</p>
+      <br>
+    </header>
+
+    <section>
+      <h2>Parameters</h3>
+      <p>None.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Return value</h3>
+      <p>Reverse iterator to the first element.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Example</h3>
+      <pre>
+#include &lt;mdarray.hpp&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    mdlib::mdarray&lt;int, 3, 3&gt; arr = {1, 2, 3,
+                                        4, 5, 6,
+                                        7, 8, 9};
+    
+
+    for(auto itr = arr.rbegin(); itr != arr.rend(); ++itr)
+    {
+        std::cout << *itr << ' ';
+    }
+    std::cout << '\n';
+}</pre>
+
+      <p>Output</p>
+      <pre>
+9 8 7 6 5 4 3 2 1</pre>
+    </section>
+  </body>
+</html>

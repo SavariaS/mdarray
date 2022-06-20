@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>mdlib::mdarray</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+  <body>
+    <nav>
+      <a href="../mdspan/mdspan.html">mdspan</a>
+    </nav>
+
+    <section>
+      <h1>mdlib::mdarray</h1>
+      <p><code>&nbsp;&nbsp;template&lt;typename T, std::size_t... N&gt; struct mdarray;</code></p>
+      <p>mdlib::mdarray is a container that acts as a multidimensional array. It is an aggreate type and holds a one-dimensional built-in array capable of holding a multi-dimensional array. It does not support multidimensional arrays that have at least one dimension with an extent of 0.</p>
+      <br>
+      <p>It meets the requirements for:</p>
+      <ul>
+        <li><a href="https://en.cppreference.com/w/cpp/named_req/Container">Container</a></li>
+        <li><a href="https://en.cppreference.com/w/cpp/named_req/ReversibleContainer">ReversibleContainer</a></li>
+        <li><a href="https://en.cppreference.com/w/cpp/named_req/ContiguousContainer">ContiguousContainer</a></li>
+      </ul>
+      <br>
+    </section>
+
+    <section>
+      <h2>Member types</h2>
+      <p>value_type             <code class="def">T</code></p>
+      <p>size_type              <code class="def"><a href="https://en.cppreference.com/w/cpp/types/size_t">std::size_t</a></code></p>
+      <p>size_ilist             <code class="def"><a href="https://en.cppreference.com/w/cpp/utility/initializer_list">const std::initializer_list&lt;size_type&gt;&</a></code></p>
+      <p>difference_type        <code class="def"><a href="https://en.cppreference.com/w/cpp/types/ptrdiff_t">std::ptrdiff_t</a></code></p>
+      <p>reference              <code class="def">value_type&</code></p>
+      <p>const_reference        <code class="def">const value_type&</code></p>
+      <p>pointer                <code class="def">value_type*</code></p>
+      <p>const_pointer          <code class="def">const value_type*</code></p>
+      <p>iterator               <code class="def">value_type*</code></p>
+      <p>const_iterator         <code class="def">const value_type*</code></p>
+      <p>reverse_iterator       <code class="def"><a href="https://en.cppreference.com/w/cpp/iterator/reverse_iterator">std::reverse_iterator&lt;iterator&gt;</a></code></p>
+      <p>const_reverse_iterator <code class="def"><a href="https://en.cppreference.com/w/cpp/iterator/reverse_iterator">std::reverse_iterator&lt;const_iterator&gt;</a></code></p>
+      <p>subspan                <code class="def">to_subspan_T&lt;value_type, N...&gt;</code></p>
+      <p>const_subspan          <code class="def">to_subspan_T&lt;const value_type, N...&gt;</code></p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Member functions</h2>
+      <h3>Element access</h3>
+      <p><a href="mdarray_at.html">at</a>                      <span class="def">Access specified element with bounds checking.</span></p>
+      <p><a href="mdarray_access_operator.html">operator[]</a> <span class="def">Access specified subarray or element.</span></p>
+      <p><a href="mdarray_front.html">front</a>                <span class="def">Access the first element.</span></p>
+      <p><a href="mdarray_back.html">back</a>                  <span class="def">Access the last element.</span></p>
+      <p><a href="mdarray_data.html">data</a>                  <span class="def">Direct access to the underlying array.</span></p>
+      
+      <h3>Iterators</h3>
+      <p><a href="mdarray_begin.html">begin, cbegin</a>     <span class="def">Returns an iterator to the beginning.</span></p>
+      <p><a href="mdarray_end.html">end, cend</a>           <span class="def">Returns an iterator to the end.</span></p>
+      <p><a href="mdarray_rbegin.html">rbegin, crbegin</a>  <span class="def">Returns a reverse iterator to the beginning.</span></p>
+      <p><a href="mdarray_rend.html">rend, crend</a>        <span class="def">Returns a reverse iterator to the end.</span></p>
+
+      <h3>Capacity</h3>
+      <p><a href="mdarray_empty.html">empty</a>         <span class="def">Returns whether the container is empty.</span></p>
+      <p><a href="mdarray_size.html">size</a>           <span class="def">Returns number of elements in the container.</span></p>
+      <p><a href="mdarray_max_size.html">max_size</a>   <span class="def">Returns the maximum number of elements.</span></p>
+      <p><a href="mdarray_size_list.html">size_list</a> <span class="def">Returns the number of elements in every dimension as an <a href="https://en.cppreference.com/w/cpp/utility/initializer_list">initializer list.</a></span></p>
+
+      <h3>Operations</h3>
+      <p><a href="mdarray_fill.html">fill</a> <span class="def">Fill the container with the specified value.</span></p>
+      <p><a href="mdarray_swap.html">swap</a> <span class="def">Swaps the contents of two containers.</span></p>
+
+      <br>
+    </section>
+
+    <section>
+      <h2>Non-member member functions</h2>
+      <p><a href="mdarray_comparison.html">operator&lt;=&gt;</a>  <span class="def">Compares two mdarray.</span></p>
+      <p><a href="standard_get.html">std::get</a>                 <span class="def">Access an element of the multidimensional array.</span></p>
+      <p><a href="standard_swap.html">std::swap</a>               <span class="def">Swaps two containers.</span></p>
+      <p><a href="mdarray_to_mdarray.html">std::to_mdarray</a>    <span class="def">Creates a mdarray from a built-in multidimensional array.</span></p>
+    </section>
+  </body>
+</html>

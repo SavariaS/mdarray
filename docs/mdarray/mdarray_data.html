@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>mdlib::mdarray<T, N...>::data</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+  <body>
+    <nav>
+        <a href="mdarray.html">Back</a>
+    </nav>
+  
+    <header>
+      <h1>mdlib::mdarray&lt;T, N...&gt;::data</h3>
+      <p><code>&nbsp;&nbsp;constexpr pointer data() noexcept;</code></p>
+      <p><code>&nbsp;&nbsp;constexpr const_pointer data() const noexcept;</code></p>
+      <p>Returns pointer to the underlying one-dimensional array serving as element storage.</p>
+      <br>
+    </header>
+
+    <section>
+      <h2>Parameters</h3>
+      <p>None.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Return value</h3>
+      <p>Pointer to the underlying element storage.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Example</h3>
+      <pre>
+#include &lt;mdarray.hpp&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    mdlib::mdarray&lt;int, 3, 2, 2&gt; arr = {1, 2,   3, 4,
+                                        2, 4,   6, 8,
+                                        1, 3,   5, 7};
+    
+
+    int* storage = arr.data();
+
+    std::cout << "Data: ";
+    for(int i = 0; i &lt; arr.size(); ++i)
+    {
+        std::cout << storage[i] << ' ';
+    }
+    std::cout << '\n';
+}</pre>
+
+      <p>Output</p>
+      <pre>
+Data: 1 2 3 4 2 4 6 8 1 3 5 7</pre>
+    </section>
+  </body>
+</html>

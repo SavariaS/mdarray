@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>mdlib::mdarray<T, N...>::swap</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+  <body>
+    <nav>
+        <a href="mdarray.html">Back</a>
+    </nav>
+  
+    <header>
+      <h1>mdlib::mdarray&lt;T, N...&gt;::swap</h3>
+        <p><code>&nbsp;&nbsp;constexpr void swap(mdarray&lt;T, N...&gt;& other);</code></p>
+        <p>Exchange the contents with another container.</p>
+      <br>
+    </header>
+
+    <section>
+      <h2>Parameters</h3>
+      <p><strong>other</strong> - the container to exchange contents with.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Return value</h3>
+      <p>(none)</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Example</h3>
+      <pre>
+#include &lt;mdarray.hpp&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    mdlib::mdarray&lt;int, 2, 2&gt; arr1 = {1, 0,
+                                        0, 1};
+
+    mdlib::mdarray&lt;int, 2, 2&gt; arr2 = {1, 2,
+                                        3, 4};
+    
+    arr1.swap(arr2);
+
+    std::cout << "arr1:\n";
+    for(auto elem : arr1)
+    {
+        std::cout << elem << ' ';
+    }
+    std::cout << "\n\n";
+
+    std::cout << "arr2:\n";
+    for(auto elem : arr2)
+    {
+        std::cout << elem << ' ';
+    }
+    std::cout << '\n';
+}</pre>
+
+      <p>Output</p>
+      <pre>
+arr1:
+1 2 3 4 
+
+arr2:
+1 0 0 1</pre>
+    </section>
+  </body>
+</html>

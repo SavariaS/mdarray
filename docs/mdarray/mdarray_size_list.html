@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>mdlib::mdarray<T, N...>::size_list</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+  <body>
+    <nav>
+        <a href="mdarray.html">Back</a>
+    </nav>
+  
+    <header>
+      <h1>mdlib::mdarray&lt;T, N...&gt;::size_list</h3>
+      <p><code>&nbsp;&nbsp;constexpr size_ilist size_list() const noexcept;</code></p>
+      <p>Returns the number of elements in each dimension of the container.</p>
+      <br>
+    </header>
+
+    <section>
+      <h2>Parameters</h3>
+      <p>None.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Return value</h3>
+      <p>The number of elements in each dimension.</p>
+      <br>
+    </section>
+
+    <section>
+        <h2>Example</h3>
+        <pre>
+  #include &lt;mdarray.hpp&gt;
+  #include &lt;iostream&gt;
+  
+  int main()
+  {
+      mdlib::mdarray&lt;int, 4, 8, 3&gt; arr;
+      
+      // Print the size of every dimension
+      std::cout << "The size of the array is: ";
+      for(std::size_t dimension : arr.size_list())
+      {
+          std::cout << dimension << ' ';
+      }
+      std::cout << '\n';
+  }</pre>
+  
+        <p>Output</p>
+        <pre>
+The size of the array is: 4 8 3 </pre>
+      </section>
+  </body>
+</html>

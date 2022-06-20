@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>mdlib::mdspan</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+  <body>
+    <nav>
+      <a href="../mdarray/mdarray.html">mdarray</a>
+    </nav>
+
+    <section>
+      <h1>mdlib::mdspan</h1>
+      <p><code>&nbsp;&nbsp;template&lt;typename T, std::size_t... N&gt; struct mdspan;</code></p>
+      <p>mdlib::mdspan is a non-owning span to a multidimensional array. Its interface is minimal and it is used as a span when accessing subarrays of a mdarray.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Member types</h2>
+      <p>value_type             <code class="def">T</code></p>
+      <p>size_type              <code class="def"><a href="https://en.cppreference.com/w/cpp/types/size_t">std::size_t</a></code></p>
+      <p>size_ilist             <code class="def"><a href="https://en.cppreference.com/w/cpp/utility/initializer_list">const std::initializer_list&lt;size_type&gt;&</a></code></p>
+      <p>difference_type        <code class="def"><a href="https://en.cppreference.com/w/cpp/types/ptrdiff_t">std::ptrdiff_t</a></code></p>
+      <p>pointer                <code class="def">value_type*</code></p>
+      <p>const_pointer          <code class="def">const value_type*</code></p>
+      <p>iterator               <code class="def">value_type*</code></p>
+      <p>const_iterator         <code class="def">const value_type*</code></p>
+      <p>reverse_iterator       <code class="def"><a href="https://en.cppreference.com/w/cpp/iterator/reverse_iterator">std::reverse_iterator&lt;iterator&gt;</a></code></p>
+      <p>const_reverse_iterator <code class="def"><a href="https://en.cppreference.com/w/cpp/iterator/reverse_iterator">std::reverse_iterator&lt;const_iterator&gt;</a></code></p>
+      <p>subspan                <code class="def">to_subspan_T&lt;value_type, N...&gt;</code></p>
+      <p>const_subspan          <code class="def">to_subspan_T&lt;const value_type, N...&gt;</code></p>
+      <p>array                  <code class="def">md_array&lt;T, N...&gt;</code></p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Member functions</h2>
+      <h3>Element access</h3>
+      <p><a href="mdspan_access_operator.html">operator[]</a> <span class="def">Access specified subarray or element.</span></p>
+      <p><a href="mdspan_data.html">data</a>                  <span class="def">Direct access to the underlying array.</span></p>
+      
+      <h3>Iterators</h3>
+      <p><a href="mdspan_begin.html">begin, cbegin</a>     <span class="def">Returns an iterator to the beginning.</span></p>
+      <p><a href="mdspan_end.html">end, cend</a>           <span class="def">Returns an iterator to the end.</span></p>
+      <p><a href="mdspan_rbegin.html">rbegin, crbegin</a>  <span class="def">Returns a reverse iterator to the beginning.</span></p>
+      <p><a href="mdspan_rend.html">rend, crend</a>        <span class="def">Returns a reverse iterator to the end.</span></p>
+
+      <h3>Capacity</h3>
+      <p><a href="mdspan_size.html">size</a>           <span class="def">Returns number of elements in the container.</span></p>
+      <p><a href="mdspan_size_list.html">size_list</a> <span class="def">Returns the number of elements in every dimension as an <a href="https://en.cppreference.com/w/cpp/utility/initializer_list">initializer list.</a></span></p>
+
+      <br>
+    </section>
+
+    <section>
+      <h2>Non-member member functions</h2>
+      <p><a href="mdspan_comparison.html">operator&lt;=&gt;</a>  <span class="def">Compares two mdspan.</span></p>
+    </section>
+  </body>
+</html>

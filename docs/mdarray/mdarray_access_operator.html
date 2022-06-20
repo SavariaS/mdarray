@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>mdlib::mdarray<T, N...>::operator[]</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+  <body>
+    <nav>
+        <a href="mdarray.html">Back</a>
+    </nav>
+  
+    <header>
+      <h1>mdlib::mdarray&lt;T, N...&gt;::operator[]</h3>
+      <p><code>&nbsp;&nbsp;constexpr subspan operator[](size_type pos);</code></p>
+      <p><code>&nbsp;&nbsp;constexpr const_subspan operator[](size_type pos) const;</code></p>
+      <p>Returns a subarray or a reference to the element at the specified position. No bounds checking is performed.</p>
+      <br>
+    </header>
+
+    <section>
+      <h2>Parameters</h3>
+      <p><strong>pos</strong> - position of the element to return.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Return value</h3>
+      <p>The subarray at the requested position if <code>sizeof...(N) > 1</code></p>
+      <p>A reference to the requested element if <code>sizeof...(N) == 1</code></p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Example</h3>
+      <pre>
+#include &lt;mdarray.hpp&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    mdlib::mdarray&lt;int, 2, 3&gt; arr = {1, 3, 5,
+                                        2, 4, 6};
+    
+    // Assignment
+    arr[1][2] = 8;
+
+    // Access
+    std::cout << "First row, third element: " << arr[0][2] << '\n';
+
+    std::cout << "Second row: ";
+    for(int value : arr[1])
+        std::cout << value << ' ';
+    std::cout << '\n';
+}</pre>
+
+      <p>Output</p>
+      <pre>
+First row, third element: 5
+Second row: 2 4 8 </pre>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>mdlib::mdarray<T, N...>::front</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+  <body>
+    <nav>
+        <a href="mdarray.html">Back</a>
+    </nav>
+  
+    <header>
+      <h1>mdlib::mdarray&lt;T, N...&gt;::front</h3>
+      <p><code>&nbsp;&nbsp;constexpr reference front();</code></p>
+      <p><code>&nbsp;&nbsp;constexpr const_reference front() const;</code></p>
+      <p>Returns a reference to the first element in the container.</p>
+      <br>
+    </header>
+
+    <section>
+      <h2>Parameters</h3>
+      <p>None.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Return value</h3>
+      <p>Reference to the first element.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Example</h3>
+      <pre>
+#include &lt;mdarray.hpp&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    mdlib::mdarray&lt;float, 2, 2&gt; arr = {-1.0f, 0.0f,
+                                        0.0f, 1.0f};
+    
+    std::cout << "The first number is: " << arr.front() << "\n";
+}</pre>
+
+      <p>Output</p>
+      <pre>
+The first number is: -1</pre>
+    </section>
+  </body>
+</html>

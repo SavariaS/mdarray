@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>std::to_mdarray</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+  <body>
+    <nav>
+        <a href="mdarray.html">Back</a>
+    </nav>
+  
+    <header>
+      <h1>std::to_mdarray</h3>
+        <p><code>&nbsp;&nbsp;template&lt;typename T, std::size_t N&gt;</code><br>
+           <code>&nbsp;&nbsp;constexpr mdlib::from_array&lt;std::remove_cv_t&lt;T[N]&gt;&gt; to_mdarray(T (&arr)[N])</code></p>
+        <p>Creates a mdarray from a built-in multidimensional array.</p>
+      <br>
+    </header>
+
+    <section>
+      <h2>Parameters</h3>
+      <p><strong>arr</strong> - the built-in multidimensional array to be converted to mdarray.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Return value</h3>
+      <p>The corresponding mdarray.</p>
+      <br>
+    </section>
+
+    <section>
+      <h2>Example</h3>
+      <pre>
+#include &lt;mdarray.hpp&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    int builtin_matrice[3][3] = {1, 0, 0,
+                                 0, 1, 0,
+                                 0, 0, 1};
+
+    mdlib::mdarray&lt;int, 3, 3&gt; from_builtin = std::to_mdarray(builtin_matrice);
+
+    std::cout << "Built-in:\n";
+    for(int i = 0; i &lt; 3; ++i)
+    {
+        for(int j = 0; j &lt; 3; ++j)
+        {
+            std::cout << builtin_matrice[i][j] << ' ';
+        }
+        std::cout << '\n';
+    }
+
+    std::cout << "\nmdarray:\n";
+    for(int i = 0; i &lt; 3; ++i)
+    {
+        for(int j = 0; j &lt; 3; ++j)
+        {
+            std::cout << from_builtin[i][j] << ' ';
+        }
+        std::cout << '\n';
+    }
+}</pre>
+
+      <p>Output</p>
+      <pre>
+Built-in:
+1 0 0 
+0 1 0 
+0 0 1 
+
+mdarray:
+1 0 0 
+0 1 0 
+0 0 1 </pre>
+    </section>
+  </body>
+</html>
