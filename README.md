@@ -4,8 +4,8 @@
 
 ## Documentation
 
-[mdarray](https://github.com/SavariaS/mdarray/blob/master/docs/mdarray/mdarray.html) <br>
-[mdspan](https://github.com/SavariaS/mdarray/blob/master/docs/mdspan/mdspan.html) <br>
+[mdarray](https://htmlpreview.github.io/?https://github.com/SavariaS/mdarray/blob/master/docs/mdarray/mdarray.html)<br>
+[mdspan](https://htmlpreview.github.io/?https://github.com/SavariaS/mdarray/blob/master/docs/mdspan/mdspan.html)<br>
 
 ## Related proposals
 
