@@ -13,7 +13,7 @@
     <header>
       <h1>std::to_mdarray</h3>
         <p><code>&nbsp;&nbsp;template&lt;typename T, std::size_t N&gt;</code><br>
-           <code>&nbsp;&nbsp;constexpr mdlib::from_array&lt;std::remove_cv_t&lt;T[N]&gt;&gt; to_mdarray(T (&arr)[N])</code></p>
+           <code>&nbsp;&nbsp;constexpr xcontainer::from_array&lt;std::remove_cv_t&lt;T[N]&gt;&gt; to_mdarray(T (&arr)[N])</code></p>
         <p>Creates a mdarray from a built-in multidimensional array.</p>
       <br>
     </header>
@@ -42,7 +42,7 @@ int main()
                                  0, 1, 0,
                                  0, 0, 1};
 
-    mdlib::mdarray&lt;int, 3, 3&gt; from_builtin = std::to_mdarray(builtin_matrice);
+    xcontainer::mdarray&lt;int, 3, 3&gt; from_builtin = std::to_mdarray(builtin_matrice);
 
     std::cout << "Built-in:\n";
     for(int i = 0; i &lt; 3; ++i)

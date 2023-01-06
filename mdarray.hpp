@@ -13,7 +13,7 @@
 #include <cstring>
 
 
-namespace mdlib
+namespace xcontainer
 {
     //--- Forward declaration ---//
     template<typename T, std::size_t... N>
@@ -377,42 +377,42 @@ namespace mdlib
 namespace std
 {
     template<std::size_t... I, typename T, std::size_t... N>
-    T& get(mdlib::mdarray<T, N...>& arr)
+    T& get(xcontainer::mdarray<T, N...>& arr)
     {
         return arr.at(I...);
     }
 
     template<typename T, std::size_t... N>
-    void swap(mdlib::mdarray<T, N...>& lhs, mdlib::mdarray<T, N...>& rhs)
+    void swap(xcontainer::mdarray<T, N...>& lhs, xcontainer::mdarray<T, N...>& rhs)
     {
         lhs.swap(rhs);
     }
 
     template<typename T, std::size_t N>
-    constexpr mdlib::from_array<std::remove_cv_t<T[N]>> to_mdarray(T (&arr)[N])
+    constexpr xcontainer::from_array<std::remove_cv_t<T[N]>> to_mdarray(T (&arr)[N])
     {
-        mdlib::from_array<std::remove_cv_t<T[N]>> temp{};
+        xcontainer::from_array<std::remove_cv_t<T[N]>> temp{};
         std::memcpy(temp.data(), arr, sizeof(temp));
         return temp;
     }
 
     template<typename T, std::size_t... N>
-    struct rank<mdlib::mdarray<T, N...>> : public std::integral_constant<std::size_t, sizeof...(N)> {};
+    struct rank<xcontainer::mdarray<T, N...>> : public std::integral_constant<std::size_t, sizeof...(N)> {};
 
     template<typename T, std::size_t... N>
-    struct rank<mdlib::mdspan<T, N...>> : public std::integral_constant<std::size_t, sizeof...(N)> {};
+    struct rank<xcontainer::mdspan<T, N...>> : public std::integral_constant<std::size_t, sizeof...(N)> {};
 
     template<typename T, std::size_t Head, std::size_t... Tail>
-    struct extent<mdlib::mdarray<T, Head, Tail...>, 0> : std::integral_constant<std::size_t, Head> {};
+    struct extent<xcontainer::mdarray<T, Head, Tail...>, 0> : std::integral_constant<std::size_t, Head> {};
 
     template<typename T, std::size_t Head, std::size_t... Tail, unsigned N>
-    struct extent<mdlib::mdarray<T, Head, Tail...>, N> : std::extent<mdlib::mdarray<T, Tail...>, N-1> {};
+    struct extent<xcontainer::mdarray<T, Head, Tail...>, N> : std::extent<xcontainer::mdarray<T, Tail...>, N-1> {};
 
     template<typename T, std::size_t Head, std::size_t... Tail>
-    struct extent<mdlib::mdspan<T, Head, Tail...>, 0> : std::integral_constant<std::size_t, Head> {};
+    struct extent<xcontainer::mdspan<T, Head, Tail...>, 0> : std::integral_constant<std::size_t, Head> {};
 
     template<typename T, std::size_t Head, std::size_t... Tail, unsigned N>
-    struct extent<mdlib::mdspan<T, Head, Tail...>, N> : std::extent<mdlib::mdspan<T, Tail...>, N-1> {};
+    struct extent<xcontainer::mdspan<T, Head, Tail...>, N> : std::extent<xcontainer::mdspan<T, Tail...>, N-1> {};
 }
 
 #endif

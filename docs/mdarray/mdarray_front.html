@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>mdlib::mdarray<T, N...>::front</title>
+    <title>xcontainer::mdarray<T, N...>::front</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
@@ -11,7 +11,7 @@
     </nav>
   
     <header>
-      <h1>mdlib::mdarray&lt;T, N...&gt;::front</h3>
+      <h1>xcontainer::mdarray&lt;T, N...&gt;::front</h3>
       <p><code>&nbsp;&nbsp;constexpr reference front();</code></p>
       <p><code>&nbsp;&nbsp;constexpr const_reference front() const;</code></p>
       <p>Returns a reference to the first element in the container.</p>
@@ -38,7 +38,7 @@
 
 int main()
 {
-    mdlib::mdarray&lt;float, 2, 2&gt; arr = {-1.0f, 0.0f,
+    xcontainer::mdarray&lt;float, 2, 2&gt; arr = {-1.0f, 0.0f,
                                         0.0f, 1.0f};
     
     std::cout << "The first number is: " << arr.front() << "\n";

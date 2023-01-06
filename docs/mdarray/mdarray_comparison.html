@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>mdlib::mdarray<T, N...>::operator<=></title>
+    <title>xcontainer::mdarray<T, N...>::operator<=></title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
@@ -11,7 +11,7 @@
     </nav>
   
     <header>
-      <h1>mdlib::mdarray&lt;T, N...&gt;::operator&lt;=&gt;</h3>
+      <h1>xcontainer::mdarray&lt;T, N...&gt;::operator&lt;=&gt;</h3>
         <p><code>&nbsp;&nbsp;template&lt;typename T, std::size_t... N&gt;<br>
                  &nbsp;&nbsp;bool operator&lt;=&gt;(const mdarray&lt;T, N...&gt;& rhs, const mdarray&lt;T, N...&gt;& lhs)</code></p>
         <p>Compares the content of two arrays.</p>
@@ -38,13 +38,13 @@
 
 int main()
 {
-    mdlib::mdarray&lt;int, 5, 4&gt; arr1 = {12, 12, 12, 12,
+    xcontainer::mdarray&lt;int, 5, 4&gt; arr1 = {12, 12, 12, 12,
                                       12, 12, 12, 12,
                                       12, 12, 12, 12,
                                       12, 12, 12, 12,
                                       12, 12, 12, 12};
     
-    mdlib::mdarray&lt;int, 5, 4&gt; arr2;
+    xcontainer::mdarray&lt;int, 5, 4&gt; arr2;
     arr2.fill(12);
 
     if(arr1 &lt;=&gt; arr2 == 0)

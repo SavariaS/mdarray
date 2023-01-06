@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>std::get(mdlib::mdarray)</title>
+    <title>std::get(xcontainer::mdarray)</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
@@ -11,9 +11,9 @@
     </nav>
   
     <header>
-      <h1>std::get(mdlib::mdarray)</h3>
+      <h1>std::get(xcontainer::mdarray)</h3>
         <p><code>&nbsp;&nbsp;template&lt;std::size_t... I, typename T, std::size_t... N&gt;</code><br>
-           <code>&nbsp;&nbsp;T& get(mdlib::mdarray&lt;T, N...&gt;& arr);</code></p>
+           <code>&nbsp;&nbsp;T& get(xcontainer::mdarray&lt;T, N...&gt;& arr);</code></p>
         <p>Returns the Ith element from the multidimensional array.</p>
       <br>
     </header>
@@ -38,7 +38,7 @@
 
 int main()
 {
-    mdlib::mdarray&lt;int, 3, 3&gt; arr = {1, 2, 3,
+    xcontainer::mdarray&lt;int, 3, 3&gt; arr = {1, 2, 3,
                                         4, 5, 6,
                                         7, 8, 9};
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>mdlib::mdarray<T, N...>::data</title>
+    <title>xcontainer::mdarray<T, N...>::data</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
@@ -11,7 +11,7 @@
     </nav>
   
     <header>
-      <h1>mdlib::mdarray&lt;T, N...&gt;::data</h3>
+      <h1>xcontainer::mdarray&lt;T, N...&gt;::data</h3>
       <p><code>&nbsp;&nbsp;constexpr pointer data() noexcept;</code></p>
       <p><code>&nbsp;&nbsp;constexpr const_pointer data() const noexcept;</code></p>
       <p>Returns pointer to the underlying one-dimensional array serving as element storage.</p>
@@ -38,7 +38,7 @@
 
 int main()
 {
-    mdlib::mdarray&lt;int, 3, 2, 2&gt; arr = {1, 2,   3, 4,
+    xcontainer::mdarray&lt;int, 3, 2, 2&gt; arr = {1, 2,   3, 4,
                                         2, 4,   6, 8,
                                         1, 3,   5, 7};
     

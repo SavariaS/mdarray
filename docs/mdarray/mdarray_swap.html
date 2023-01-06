@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>mdlib::mdarray<T, N...>::swap</title>
+    <title>xcontainer::mdarray<T, N...>::swap</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
@@ -11,7 +11,7 @@
     </nav>
   
     <header>
-      <h1>mdlib::mdarray&lt;T, N...&gt;::swap</h3>
+      <h1>xcontainer::mdarray&lt;T, N...&gt;::swap</h3>
         <p><code>&nbsp;&nbsp;constexpr void swap(mdarray&lt;T, N...&gt;& other);</code></p>
         <p>Exchange the contents with another container.</p>
       <br>
@@ -37,10 +37,10 @@
 
 int main()
 {
-    mdlib::mdarray&lt;int, 2, 2&gt; arr1 = {1, 0,
+    xcontainer::mdarray&lt;int, 2, 2&gt; arr1 = {1, 0,
                                         0, 1};
 
-    mdlib::mdarray&lt;int, 2, 2&gt; arr2 = {1, 2,
+    xcontainer::mdarray&lt;int, 2, 2&gt; arr2 = {1, 2,
                                         3, 4};
     
     arr1.swap(arr2);

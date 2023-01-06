@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>mdlib::mdarray<T, N...>::fill</title>
+    <title>xcontainer::mdarray<T, N...>::fill</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
@@ -11,7 +11,7 @@
     </nav>
   
     <header>
-      <h1>mdlib::mdarray&lt;T, N...&gt;::fill</h3>
+      <h1>xcontainer::mdarray&lt;T, N...&gt;::fill</h3>
         <p><code>&nbsp;&nbsp;constexpr void fill(const value_type& value);</code></p>
         <p>Assign the specified value to every element in the container.</p>
       <br>
@@ -37,7 +37,7 @@
 
 int main()
 {
-    mdlib::mdarray&lt;int, 4, 4&gt; arr;
+    xcontainer::mdarray&lt;int, 4, 4&gt; arr;
     arr.fill(2);
     
     for(int i = 0; i &lt; 4; ++ i)
