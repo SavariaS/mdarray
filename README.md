@@ -19,4 +19,6 @@
 
 ## To-Do
 
-- Change `xcontainer::mdspan`'s interface to be the same as `std::span`
+- Add the new functions to the documentation
+- Update the documentation to reflect the changes to existing functions
+- Update the container's description to "partially satisfies the requirements of Container and SequenceContainer".

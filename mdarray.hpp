@@ -1,198 +1,237 @@
 #ifndef MDARRAY_HPP
 #define MDARRAY_HPP
 
-// Types 
-#include <cstddef>
-#include <iterator>
-#include <initializer_list>
-// Exceptions 
-#include <stdexcept>
-// Type traits
-#include <type_traits>
-// Memcpy
-#include <cstring>
+#include <cstddef> // std::size_t, std::ptrdiff
+#include <iterator> // std::reverse_iterator
+#include <initializer_list> // std::initializer_list
+#include <stdexcept> // std::out_of_range
+#include <type_traits> // General type traits
+#include <cstring> // std::memcpy
+#include <utility> // std::index_sequence, std::make_index_sequence
+#include <algorithm> // std::copy
+#include <tuple> // std::make_tuple
 
-
+//--- Forward declaration ---//
 namespace xcontainer
 {
-    //--- Forward declaration ---//
     template<typename T, std::size_t... N>
     struct mdarray;
     template<typename T, std::size_t... N>
     struct mdspan;
+}
 
-    //--- Helper metafunctions ---//
-    template<typename T, std::size_t D>
-    using id = T;
+//--- Helper metafunctions ---//
+namespace detail
+{
+    //-- to_subspan ---//
+    // Returns a subspan of mdspan. The first dimension (Head) is replaced by Count (N)
+    template<typename T, std::size_t N, std::size_t Head, std::size_t... Tail>
+    struct to_subspan
+    {
+        using type = xcontainer::mdspan<T, N, Tail...>;
+    };
 
-    // Forward declaration of subarray
+    //-- to_subview --//
+    // Returns a view to a subarray. The first dimension (Head) is dropped
     template<typename T, std::size_t... N>
-    struct to_subarray;
+    struct to_subview;
     template<typename T, std::size_t... N>
-    using to_subarray_T = typename to_subarray<T, N...>::type;
+    using to_subview_t = typename to_subview<T, N...>::type;
 
     template<typename T, std::size_t Head>
-    struct to_subarray<T, Head>
+    struct to_subview<T, Head>
     {
         using type = T&;
     };
 
     template<typename T, std::size_t Head, std::size_t... Tail>
-    struct to_subarray<T, Head, Tail...>
+    struct to_subview<T, Head, Tail...>
     {
-        using type = mdarray<T, Tail...>;
+        using type = xcontainer::mdspan<T, Tail...>;
     };
 
-    // Forward declaration of subarray
-    template<typename T, std::size_t... N>
-    struct to_subspan;
-    template<typename T, std::size_t... N>
-    using to_subspan_T = typename to_subspan<T, N...>::type;
-
-    template<typename T, std::size_t Head>
-    struct to_subspan<T, Head>
-    {
-        using type = T&;
-    };
-
-    template<typename T, std::size_t Head, std::size_t... Tail>
-    struct to_subspan<T, Head, Tail...>
-    {
-        using type = mdspan<T, Tail...>;
-    };
-
-    // Forward declaration of index_sequence
-    template<std::size_t... N>
-    struct index_sequence {};
-
-    // Forward declaration of next_index_sequence
-    template<typename T>
-    struct next_index_sequence;
-
-    template<std::size_t... N>
-    struct next_index_sequence<index_sequence<N...>>
-    {
-        using type = index_sequence<N..., sizeof...(N)>;
-    };
-
-    // Forward declaration of make_index_seq_impl
-    template<std::size_t I, std::size_t N>
-    struct make_index_seq_impl;
-    template<std::size_t N>
-    using make_index_sequence = make_index_seq_impl<0, N>::type;
-
-    template<std::size_t I, std::size_t N>
-    struct make_index_seq_impl
-    {
-        using type = next_index_sequence<typename make_index_seq_impl<I+1, N>::type>::type;
-    };
-
-    template<std::size_t N>
-    struct make_index_seq_impl<N, N>
-    {
-        using type = index_sequence<>;
-    };
-
-    // Forward declaration of from_array_impl
+    //-- from_array --//
+    // Returns the mdarray type equivalent to a built-in multidimensional array
     template <typename T, typename Seq>
     struct from_array_impl;
 
     template <typename T, size_t... Is>
-    struct from_array_impl<T, index_sequence<Is...>> 
+    struct from_array_impl<T, std::index_sequence<Is...>> 
     {
-        using type = mdarray<std::remove_all_extents_t<T>, std::extent_v<T, Is>...>;
+        using type = xcontainer::mdarray<std::remove_all_extents_t<T>, std::extent_v<T, Is>...>;
     };
 
     template <typename T>
-    using from_array = from_array_impl<T, make_index_sequence<std::rank_v<T>>>::type; // Deduce the number of dimensions (rank) of a built-in array and return the corresponding mdarray
+    using from_array = from_array_impl<T, std::make_index_sequence<std::rank_v<T>>>::type; // Deduce the number of dimensions (rank) of a built-in array and return the corresponding mdarray
 
-    // Copies range
-    template<class InputItr>
-    void copy(InputItr first, InputItr last, InputItr dest)
-    {
-        while(first != last)
-        {
-            *dest = *first;
-
-            ++first; 
-            ++dest;
-        }
-    }
-
-    //--- mdspan ---//
+    //-- to_array --//
+    // Returns the type of a built-in multidimensional array equivalent to a mdspan
     template<typename T, std::size_t... N>
+    struct to_array;
+    template<typename T, std::size_t... N>
+    using to_array_t = typename to_array<T, N...>::type;
+
+    template<typename T, std::size_t Head>
+    struct to_array<T, Head>
+    {
+        using type = T[Head];
+    };
+
+    template<typename T, std::size_t Head, std::size_t... Tail>
+    struct to_array<T, Head, Tail...>
+    {
+        using U = typename to_array<T, Tail...>::type;
+        using type = U[Head];
+    };
+
+    //-- to_bytes --//
+    // Returns a span of bytes equivalent to another span of T
+    template <auto N>
+    struct constant { static constexpr auto value = N; };
+
+    template <typename B, typename T, typename Tuple, std::size_t... Is>
+    auto to_bytes_impl(Tuple, std::index_sequence<Is...>) 
+    -> xcontainer::mdspan<
+        B,
+        std::tuple_element_t<Is, Tuple>::value...,
+        std::tuple_element_t<sizeof...(Is), Tuple>::value * sizeof(T)>;
+    
+    template <typename T, std::size_t... N>
+    using to_bytes_t = decltype(to_bytes_impl<const std::byte, T>( std::make_tuple(constant<N>{}...), std::make_index_sequence<sizeof...(N) - 1>{} ));
+
+    template <typename T, std::size_t... N>
+    using to_writable_bytes_t = decltype(to_bytes_impl<std::byte, T>( std::make_tuple(constant<N>{}...), std::make_index_sequence<sizeof...(N) - 1>{} ));
+}
+
+namespace xcontainer
+{
+    //--- mdspan ---//
+    template<typename T, std::size_t... Extents>
     struct mdspan
     {
         public:
             //--- Type definitions ---//
-            using value_type = T;
+            using value_type             = T;
             using size_type              = std::size_t;
             using size_ilist             = const std::initializer_list<size_type>&;
             using difference_type        = std::ptrdiff_t;
 
+            using reference              = detail::to_subview_t<value_type, Extents...>;
             using pointer                = value_type*;
-            using const_pointer          = const value_type*;
+
             using iterator               = value_type*;
             using const_iterator         = const value_type*;
             using reverse_iterator       = std::reverse_iterator<iterator>;
             using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-            using subspan                = to_subspan_T<value_type, N...>;
-            using const_subspan          = to_subspan_T<const value_type, N...>;
-            using array                  = mdarray<T, N...>;
-
-            //--- Data member ---//
-            pointer _m_ptr;
+            template<std::size_t Count>
+            using subspan_t              = typename detail::to_subspan<T, Count, Extents...>::type;
 
             //--- Constructors and conversion operators ---//
-            mdspan() : _m_ptr(nullptr) {}
-            mdspan(pointer ptr) : _m_ptr(ptr) {}
+            constexpr mdspan() noexcept : _m_data(nullptr) {}
 
-            operator array() const; // Implicit conversion back to a mdarray
+            constexpr mdspan(detail::to_array_t<T, Extents...> arr) : _m_data((pointer)arr) {}
+
+            template<typename Itr, std::enable_if_t<!std::is_array_v<Itr> &&                                 // Not an array
+                                                    !std::is_same_v<Itr, mdarray<T, Extents...>> &&          // Not mdarray
+                                                    !std::is_same_v<Itr, mdspan<T, Extents...>>>* = nullptr> // Not mdspan
+            constexpr mdspan(Itr first) : _m_data(std::to_address(first)) {}
+
+            constexpr mdspan(mdarray<T, Extents...>& arr) noexcept : _m_data(arr.data()) {}
+
+            constexpr mdspan(const mdarray<T, Extents...>& arr) noexcept : _m_data(arr.data()) {}
+
+            constexpr mdspan(const mdspan& other) noexcept = default;
+
+            constexpr mdspan& operator=(const mdspan& other) noexcept = default;
+
+            operator mdarray<T, Extents...>() const; // Implicit conversion back to a mdarray
 
             //--- Elements access ---//
-            constexpr subspan operator[](size_type pos)
+            constexpr reference operator[](size_type pos) const
             {
-                if constexpr (sizeof...(N) == 1) // If array has 1 dimension, return the value
-                    return _m_ptr[pos];
-                else                             // Else, return a subspan
-                    return {&_m_ptr[pos * (1 * ... * N) / *s_size_ilist.begin()]};
+                if constexpr (sizeof...(Extents) == 1) // If array has 1 dimension, return the value
+                {
+                    return _m_data[pos];
+                }
+                else // Else return a view 
+                {
+                    reference span;
+                    span = reference(&_m_data[pos * span.size()]);
+
+                    return span;
+                } 
             }
 
-            constexpr const_subspan operator[](size_type pos) const
+            constexpr reference front() const
             {
-                if constexpr (sizeof...(N) == 1) // If array has 1 dimension, return the value
-                    return _m_ptr[pos];
-                else                             // Else, return a subspan
-                    return {&_m_ptr[pos * (1 * ... * N) / *s_size_ilist.begin()]};
+                return (*this)[0];
             }
 
-            constexpr pointer data() noexcept { return _m_ptr; }
-            constexpr const_pointer data() const noexcept { return _m_ptr; }
+            constexpr reference back() const
+            {
+                return (*this)[*(s_size_ilist.end() - 1) - 1];
+            }
+
+            constexpr pointer data() const noexcept { return _m_data; }
 
             //--- Iterators ---// 
             constexpr iterator begin() noexcept { return iterator(data()); }
-            constexpr iterator end()   noexcept { return iterator(data() + (1*...*N)); }
+            constexpr iterator end()   noexcept { return iterator(data() + (1*...*Extents)); }
             constexpr reverse_iterator rbegin() noexcept { return reverse_iterator(end()); }
             constexpr reverse_iterator rend()   noexcept { return reverse_iterator(begin()); }
 
             constexpr const_iterator begin() const noexcept { return const_iterator(data()); }
-            constexpr const_iterator end()   const noexcept { return const_iterator(data() + (1*...*N)); }
+            constexpr const_iterator end()   const noexcept { return const_iterator(data() + (1*...*Extents)); }
             constexpr const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(end()); }
             constexpr const_reverse_iterator rend()   const noexcept { return const_reverse_iterator(begin()); }
 
             constexpr const_iterator cbegin() const noexcept { return const_iterator(data()); }
-            constexpr const_iterator cend()   const noexcept { return const_iterator(data() + (1*...*N)); }
+            constexpr const_iterator cend()   const noexcept { return const_iterator(data() + (1*...*Extents)); }
             constexpr const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(cend()); }
             constexpr const_reverse_iterator crend()   const noexcept { return const_reverse_iterator(cbegin()); }
 
-            //--- Capacity ---//
-            constexpr size_type size() const noexcept { return (1 * ... * N); }
+            //--- Observers ---//
+            constexpr size_type size() const noexcept { return (1 * ... * Extents); }
+            constexpr size_type size_bytes() const noexcept { return size() * sizeof(T); }
             constexpr size_ilist size_list() const noexcept { return s_size_ilist; }
+            [[nodiscard]] constexpr bool empty() const noexcept { return (size() == 0) ? true : false; }
+
+            // Subviews
+            template<std::size_t Count>
+            constexpr subspan_t<Count> first()
+            {
+                subspan_t<Count> span = subspan_t<Count>(_m_data);
+
+                return span;
+            }
+
+            template<std::size_t Count>
+            constexpr subspan_t<Count> last()
+            {
+                subspan_t<Count> subspan;
+                subspan = subspan_t<Count>(end() - subspan.size());
+                
+                return subspan;
+            }
+
+            template<std::size_t Offset, std::size_t Count>
+            constexpr subspan_t<Count> subspan()
+            {
+                subspan_t<Count> subspan;
+
+                size_type elements = subspan.size() / Count;
+                subspan = subspan_t<Count>(_m_data + (elements * Offset));
+                
+                return subspan;
+            }
 
         private:
+            //--- Data member ---//
+            pointer _m_data;
+
             //--- Static size initialize list ---//
-            static constexpr size_ilist s_size_ilist = {N...};
+            static constexpr size_ilist s_size_ilist = {Extents...};
     };
 
     //--- mdarray ---//
@@ -201,7 +240,7 @@ namespace xcontainer
     {
         public:
             //--- Type definitions ---//
-            using value_type = T;
+            using value_type             = T;
             using size_type              = std::size_t;
             using size_ilist             = const std::initializer_list<size_type>&;
             using difference_type        = std::ptrdiff_t;
@@ -210,66 +249,80 @@ namespace xcontainer
             using const_reference        = const value_type&;
             using pointer                = value_type*;
             using const_pointer          = const value_type*;
+            using subview                = detail::to_subview_t<value_type, N...>;
+            using const_subview          = detail::to_subview_t<const value_type, N...>;
+
             using iterator               = value_type*;
             using const_iterator         = const value_type*;
             using reverse_iterator       = std::reverse_iterator<iterator>;
             using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-            using subspan                = to_subspan_T<value_type, N...>;
-            using const_subspan          = to_subspan_T<const value_type, N...>;
-
             //--- Data member ---//
             value_type _m_arr[(1 * ... * N)];
 
             //--- Elements access ---//
-            constexpr reference at(id<size_type, N>... pos)
+            constexpr subview at(size_type pos)
             {
-                size_type index = 0;
-                size_type weight = (1 * ... * N);
-
-                (([&index, &weight](size_type pos, size_type dim) // Glorified loop
+                size_type dim = *size_list().begin();
+                if(pos >= dim)
                 {
-                    if(pos >= dim)
-                        throw std::out_of_range("mdarray::at: pos (which is "+std::to_string(pos)+") >= dim (which is "+std::to_string(dim)+")");
+                    throw std::out_of_range("mdarray::at: pos (which is " + std::to_string(pos) + ") >= dim (which is " + std::to_string(dim) + ")");
+                }
 
-                    weight /= dim;
-                    index += pos * weight;
-                }(pos, N)),...); // For each index and its corresponding dimension...
-
-                return _m_arr[index];
+                if constexpr (sizeof...(N) == 1) // If array has 1 dimension, return the value
+                {
+                    return _m_arr[pos];
+                }
+                else                             // Else, return a subview
+                {
+                    mdspan<T, N...> view = *this;
+                    return view[pos];
+                }
             }
 
-            constexpr const_reference at(id<size_type, N>... pos) const
+            constexpr const_subview at(size_type pos) const
             {
-                size_type index = 0;
-                size_type weight = (1 * ... * N);
-
-                (([&index, &weight](size_type pos, size_type dim) // Glorified loop
+                size_type dim = *size_list().begin();
+                if(pos >= dim)
                 {
-                    if(pos >= dim)
-                        throw std::out_of_range("mdarray::at: pos (which is "+std::to_string(pos)+") >= dim (which is "+std::to_string(dim)+")");
+                    throw std::out_of_range("mdarray::at: pos (which is " + std::to_string(pos) + ") >= dim (which is " + std::to_string(dim) + ")");
+                }
 
-                    weight /= dim;
-                    index += pos * weight;
-                }(pos, N)),...); // For each index and its corresponding dimension...
-
-                return _m_arr[index];
+                if constexpr (sizeof...(N) == 1) // If array has 1 dimension, return the value
+                {
+                    return _m_arr[pos];
+                }
+                else                             // Else, return a subview
+                {
+                    mdspan<T, N...> view = *this;
+                    return view[pos];
+                }
             }
 
-            constexpr subspan operator[](size_type pos)
+            constexpr subview operator[](size_type pos)
             {
                 if constexpr (sizeof...(N) == 1) // If array has 1 dimension, return the value
+                {
                     return _m_arr[pos];
-                else                             // Else, return a subarray
-                    return {&_m_arr[pos * (1 * ... * N) / *s_size_ilist.begin()]};
+                }
+                else                             // Else, return a subview
+                {
+                    mdspan<T, N...> view = *this;
+                    return view[pos];
+                }
             }
 
-            constexpr const_subspan operator[](size_type pos) const
+            constexpr const_subview operator[](size_type pos) const
             {
                 if constexpr (sizeof...(N) == 1) // If array has 1 dimension, return the value
+                {
                     return _m_arr[pos];
-                else                             // Else, return a subarray
-                    return {&_m_arr[pos * (1 * ... * N) / *s_size_ilist.begin()]};
+                }
+                else                             // Else, return a subview
+                {
+                    mdspan<T, N...> view = *this;
+                    return view[pos];
+                }
             }
 
             constexpr reference front() { return _m_arr[0]; }
@@ -325,7 +378,7 @@ namespace xcontainer
             static constexpr size_ilist s_size_ilist = {N...};
     };
 
-    // Comparison operators
+    //-- Non-member functions --//
     template<typename T, std::size_t... N>
     bool operator<=>(const mdspan<T, N...>& rhs, const mdspan<T, N...>& lhs)
     {
@@ -362,14 +415,27 @@ namespace xcontainer
         return 0;
     }
     
-    // Conversion operator from mdpsan to mdarray
     template<typename T, std::size_t... N>
     mdspan<T, N...>::operator mdarray<T, N...>() const
     {
-        return [this]<std::size_t... Seq>(index_sequence<Seq...>) -> mdarray<value_type, N...>
+        return [this]<std::size_t... Seq>(std::index_sequence<Seq...>) -> mdarray<value_type, N...>
                {
-                   return { _m_ptr[Seq]...};
-               }(make_index_sequence<(1 * ... * N)>());
+                   return { _m_data[Seq]...};
+               }(std::make_index_sequence<(1 * ... * N)>());
+    }
+
+    template<typename T, std::size_t... N>
+    detail::to_bytes_t<T, N...> as_bytes(mdspan<T, N...> span) noexcept
+    {
+        detail::to_bytes_t<T, N...> bytes_span = reinterpret_cast<const std::byte*>(span.data());
+        return bytes_span;
+    }
+
+    template<typename T, std::size_t... N, std::enable_if_t<!std::is_const_v<T>>* = nullptr>
+    detail::to_writable_bytes_t<T, N...> as_writable_bytes(mdspan<T, N...> span) noexcept
+    {
+        detail::to_writable_bytes_t<T, N...> bytes_span = reinterpret_cast<std::byte*>(span.data());
+        return bytes_span;
     }
 }
 
@@ -389,9 +455,9 @@ namespace std
     }
 
     template<typename T, std::size_t N>
-    constexpr xcontainer::from_array<std::remove_cv_t<T[N]>> to_mdarray(T (&arr)[N])
+    constexpr detail::from_array<std::remove_cv_t<T[N]>> to_mdarray(T (&arr)[N])
     {
-        xcontainer::from_array<std::remove_cv_t<T[N]>> temp{};
+        detail::from_array<std::remove_cv_t<T[N]>> temp{};
         std::memcpy(temp.data(), arr, sizeof(temp));
         return temp;
     }
